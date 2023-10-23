@@ -47,7 +47,7 @@ class Instructeur extends BaseController
         $this->view('Instructeur/overzichtinstructeur', $data);
     }
 
-    public function overzichtVoertuigen($Id)
+    public function overzichtVoertuigen($Id, $Message = null)
     {
         $result = $this->instructeurModel->getInstructeurs();
         foreach ($result as $person) {
@@ -67,9 +67,20 @@ class Instructeur extends BaseController
                                 <td>$voertuig->Bouwjaar</td>
                                 <td>$voertuig->Brandstof</td>
                                 <td>$voertuig->RijbewijsCategorie</td>
-                                <td><a href='" . URLROOT . "instructeur/update/$voertuig->Id'>
-                                    edit
-                                </a></td>
+                                <th>
+                                    <a href='" . URLROOT . "/Voertuig/editVoertuig/" . $voertuig->Id . "'>
+                                        <span class='material-symbols-outlined'>
+                                            edit
+                                        </span>
+                                    </a>
+                                </th>
+                                <th>
+                                    <a href='" . URLROOT . "/instructeur/deleteCar/$voertuig->Id/$instructeur->Id'>
+                                        <span class='material-symbols-outlined'>
+                                            delete
+                                        </span>
+                                    </a>
+                                </th>
                                </tr> ";
             };
         } else {
@@ -79,7 +90,8 @@ class Instructeur extends BaseController
         $data = [
             'title' => 'Door instructeur gebruikte voertuigen',
             'tableRows' => $tableRows,
-            'personData' => $instructeur
+            'personData' => $instructeur,
+            'message' => $Message
         ];
 
         $this->view('Instructeur/overzichtVoertuigen', $data);
@@ -115,7 +127,7 @@ class Instructeur extends BaseController
                                </tr> ";
             };
         } else {
-            $tableRows = "<tr><td colspan='6'>Nog geen voertuigen toegewezen</td></tr>";
+            $tableRows = "<tr><td colspan='7'>Geen vrije voertuigen</td></tr>";
         }
 
         $data = [
@@ -130,5 +142,14 @@ class Instructeur extends BaseController
     public function updateVoertuigen($CarId, $PersonId)
     {
         $this->instructeurModel->addCarToInstructeur($CarId, $PersonId);
+
+        header("Location: " . URLROOT . "/instructeur/overzichtVoertuigen/$PersonId/Voertuig%20toegevoegd");
+    }
+
+    public function deleteCar($CarId, $PersonId)
+    {
+        $this->instructeurModel->deleteCarFromInstructeur($CarId, $PersonId);
+
+        header("Location: " . URLROOT . "/instructeur/overzichtVoertuigen/$PersonId/Voertuig%20verwijderd");
     }
 }
